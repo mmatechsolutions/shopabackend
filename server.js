@@ -4,6 +4,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import onboardingRoutes from "./routes/onboardingRoutes.js";
 import tenantRoutes from "./routes/tenantRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ app.use(express.json());
 
 app.use("/api", onboardingRoutes);
 app.use("/api", tenantRoutes);
-
+app.use("/api", productRoutes);
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);

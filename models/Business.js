@@ -17,6 +17,7 @@ const businessSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
     selectedPlan: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Plan",
@@ -25,32 +26,22 @@ const businessSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-/* AUTO SLUG GENERATION */
-businessSchema.pre("save", async function (next) {
-  try {
-    if (!this.isModified("businessName")) return next();
+businessSchema.pre("save", async function () {
+  if (!this.isModified("businessName")) return;
 
-    const base = this.businessName
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-");
+  const base = this.businessName
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-");
 
-    // check if slug already exists
-    const existing = await Business.findOne({ slug: base });
+  const existing = await this.constructor.findOne({ slug: base });
 
-    if (!existing) {
-      // unique → use clean slug only
-      this.slug = base;
-    } else {
-      // collision → add random suffix
-      const unique = Math.random().toString(36).substring(2, 6);
+  if (!existing) {
+    this.slug = base;
+  } else {
+    const unique = Math.random().toString(36).substring(2, 6);
 
-      this.slug = `${base}-${unique}`;
-    }
-
-    next();
-  } catch (err) {
-    next(err);
+    this.slug = `${base}-${unique}`;
   }
 });
 
